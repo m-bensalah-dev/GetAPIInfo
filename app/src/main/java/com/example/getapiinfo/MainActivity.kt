@@ -29,38 +29,33 @@ class MainActivity : AppCompatActivity() {
         recyclerViewProducts = findViewById(R.id.recyclerViewProducts)
         recyclerViewProducts.layoutManager = GridLayoutManager(this, 2)
 
-        // Fetch products from API
+
         fetchProducts()
     }
 
     private fun fetchProducts() {
         lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitObj.api.getAllProducts()
-                if (response.isSuccessful) {
-                    allProducts = response.body() ?: emptyList()
+            val response = RetrofitObj.api.getAllProducts()
+            if (response.isSuccessful) {
+                allProducts = response.body() ?: emptyList()
 
-                    // Back to main thread to update UI
-                    withContext(Dispatchers.Main) {
-                        // Show all products in RecyclerView
-                        productAdapter = ProductAdapter(allProducts)
-                        recyclerViewProducts.adapter = productAdapter
+                // Retourn  Back to UI thread pour mise ajour recycle view et spinner
+                withContext(Dispatchers.Main) {
+                    productAdapter = ProductAdapter(allProducts)
+                    recyclerViewProducts.adapter = productAdapter
 
-                        // Setup Spinner with categories
-                        setupSpinner()
-                    }
+                    setupSpinner()
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
             }
         }
     }
 
+
     private fun setupSpinner() {
-        // Get unique categories
+        // pick unique categories to for avoiding repeated values
         val categories = allProducts.map { it.category }.distinct()
 
-        // Create ArrayAdapter for Spinner
+        // Creation ArrayAdapter for Spinner
         val spinnerAdapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_item,
@@ -69,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCategories.adapter = spinnerAdapter
 
-        // Handle Spinner selection
+        // un spineer a ete selectione.
         spinnerCategories.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selectedCategory = categories[position]
@@ -77,7 +72,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
-                // Show all products if nothing selected
+                // afficher tout les produits par defaut si aucun produit a ete selectionne
                 productAdapter = ProductAdapter(allProducts)
                 recyclerViewProducts.adapter = productAdapter
             }
