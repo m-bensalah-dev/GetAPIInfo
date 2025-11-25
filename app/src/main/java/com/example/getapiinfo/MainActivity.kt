@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
             if (response.isSuccessful) {
                 allProducts = response.body() ?: emptyList()
 
-                // Retourn  Back to UI thread pour mise ajour recycle view et spinner
+                // Retourn  Back to UI thread pour mise ajour recycle view et spinner s
                 withContext(Dispatchers.Main) {
                     productAdapter = ProductAdapter(allProducts)
                     recyclerViewProducts.adapter = productAdapter
